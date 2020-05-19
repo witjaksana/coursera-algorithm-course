@@ -25,6 +25,7 @@ public class Deque<Item> implements Iterable<Item> {
     private class Node<Item> {
         private Item item;
         private Node<Item> next;
+        private Node<Item> prev;
     }
 
     // is the deque empty?
@@ -46,8 +47,12 @@ public class Deque<Item> implements Iterable<Item> {
         first = new Node<Item>();
         first.item = item;
         first.next = oldfirst;
-        if (last == null)
+        if (last == null) {
             last = first;
+        }
+        else {
+            oldfirst.prev = first;
+        }
         n++;
     }
 
@@ -60,10 +65,13 @@ public class Deque<Item> implements Iterable<Item> {
         last = new Node<Item>();
         last.item = item;
         last.next = null;
-        if (first == null)
+        if (first == null) {
             first = last;
-        else
+        }
+        else {
+            last.prev = oldlast;
             oldlast.next = last;
+        }
         n++;
     }
 
@@ -75,7 +83,12 @@ public class Deque<Item> implements Iterable<Item> {
         Item item = first.item;
         first = first.next;
         n--;
-        if (first == null) last = null;
+        if (first == null) {
+            last = null;
+        }
+        else {
+            first.prev = null;
+        }
         return item;
     }
 
@@ -84,20 +97,15 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty())
             throw new NoSuchElementException("deque is empty");
 
-        Node<Item> beforelast = first;
-        while (beforelast != last && beforelast.next != last)
-            beforelast = beforelast.next;
-
         Item item = last.item;
-        if (beforelast == last) {
-            last = null;
+        last = last.prev;
+        n--;
+        if (last == null) {
             first = null;
         }
         else {
-            last = beforelast;
-            beforelast.next = null;
+            last.next = null;
         }
-        n--;
         return item;
     }
 
@@ -134,9 +142,9 @@ public class Deque<Item> implements Iterable<Item> {
         while (!StdIn.isEmpty()) {
             String item = StdIn.readString();
             if (!item.equals("-"))
-                dc.addLast(item);
+                dc.addFirst(item);
             else if (!dc.isEmpty())
-                StdOut.print(dc.removeFirst() + " ");
+                StdOut.print(dc.removeLast() + " ");
         }
         StdOut.println("(" + dc.size() + " left on queue)");
 
