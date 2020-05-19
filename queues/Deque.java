@@ -29,7 +29,7 @@ public class Deque<Item> implements Iterable<Item> {
 
     // is the deque empty?
     public boolean isEmpty() {
-        return (first == null) || (last == null);
+        return (first == null) && (last == null);
     }
 
     // return the number of items on the deque
