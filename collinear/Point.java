@@ -109,7 +109,7 @@ public class Point implements Comparable<Point> {
             double angle2 = slopeTo(o2);
             if (angle1 < angle2) return -1;
             else if (angle1 == angle2) return 0;
-            else return 0;
+            else return 1;
         }
     }
 

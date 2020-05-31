@@ -1,32 +1,12 @@
-/*
- * MIT License
- *
- * Copyright (c) 2020 Arief Wicaksana (arief.wicaksana@outlook.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 /* *****************************************************************************
  *  Name: BruteCollinearPoints.java
  *  Date: 23/05/2020
  *  Description:
  **************************************************************************** */
+
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,16 +19,14 @@ public class BruteCollinearPoints {
     // finds all line segments containing 4 points
     public BruteCollinearPoints(Point[] points) {
         /* Checking corner case */
-        if (points == null)
-            throw new IllegalArgumentException("Error: null argument!");
+        if (points == null) throw new IllegalArgumentException("Error: null argument!");
 
         int len = points.length;
 
         for (int i = 0; i < len; i++) {
-            if (points[i] == null)
-                throw new IllegalArgumentException("Error: null input!");
+            if (points[i] == null) throw new IllegalArgumentException("Error: null input!");
             for (int j = i + 1; j < len; j++) {
-                if (points[i] == points[j])
+                if (points[i].compareTo(points[j]) == 0)
                     throw new IllegalArgumentException("Error: repeated point input!");
             }
         }
@@ -74,7 +52,7 @@ public class BruteCollinearPoints {
                         double s3 = p[0].slopeTo(p[3]);
                         if (s1 == s3) {
                             Arrays.sort(p);
-                            ls.add(new LineSegment(ps[0], ps[3]));
+                            ls.add(new LineSegment(p[0], p[3]));
                         }
                     }
                 }
@@ -95,6 +73,32 @@ public class BruteCollinearPoints {
     }
 
     public static void main(String[] args) {
+        // read the n points from a file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+
+        // draw the points
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p : points) {
+            p.draw();
+        }
+        StdDraw.show();
+
+        // print and draw the line segments
+        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+            segment.draw();
+        }
+        StdDraw.show();
 
     }
 }

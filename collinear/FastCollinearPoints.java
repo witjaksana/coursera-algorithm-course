@@ -1,54 +1,76 @@
-/*
- * MIT License
- *
- * Copyright (c) 2020 Arief Wicaksana (arief.wicaksana@outlook.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 /* *****************************************************************************
- *  Name:
+ *  Name: FastCollinearPoints.java
  *  Date: 24/05/2020
  *  Description:
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class FastCollinearPoints {
 
-    private LineSegment[] lineseg;
+    private final LineSegment[] lineseg;
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
         /* Checking corner case */
-        if (points == null)
-            throw new IllegalArgumentException("Error: null argument!");
+        if (points == null) throw new IllegalArgumentException("Error: null argument!");
 
         int len = points.length;
 
         for (int i = 0; i < len; i++) {
-            if (points[i] == null)
-                throw new IllegalArgumentException("Error: null input!");
+            if (points[i] == null) throw new IllegalArgumentException("Error: null input!");
             for (int j = i + 1; j < len; j++) {
-                if (points[i] == points[j])
+                if (points[i].compareTo(points[j]) == 0)
                     throw new IllegalArgumentException("Error: repeated point input!");
             }
         }
 
+        /* construction */
+        Point[] ps = points.clone();
+        Arrays.sort(ps);
+
+        List<LineSegment> ls = new ArrayList<>();
+
+        for (int i = 0; i < len; i++) {
+            Point[] p = ps.clone();
+            Arrays.sort(p, p[i].slopeOrder());
+            int j = 1;
+            while (j < len - 2) {
+                int k = j;
+                double s1 = p[0].slopeTo(p[k++]);
+                double s2;
+                do {
+                    if (k == len) {
+                        k++;
+                        break;
+                    }
+                    s2 = p[0].slopeTo(p[k++]);
+                } while (s1 == s2);
+                if (k - j < 4) {
+                    j++;
+                    continue;
+                }
+                int lth = k-- - j;
+                Point[] line = new Point[lth];
+                line[0] = p[0];
+                for (int m = 1; m < lth; m++) {
+                    line[m] = p[j + m - 1];
+                }
+                Arrays.sort(line);
+                if (line[0] == p[0]) {
+                    ls.add(new LineSegment(line[0], line[lth - 1]));
+                }
+                j = k;
+            }
+        }
+
+        lineseg = ls.toArray(new LineSegment[ls.size()]);
     }
 
     // the number of line segments
@@ -62,6 +84,31 @@ public class FastCollinearPoints {
     }
 
     public static void main(String[] args) {
+        // read the n points from a file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
 
+        // draw the points
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p : points) {
+            p.draw();
+        }
+        StdDraw.show();
+
+        // print and draw the line segments
+        FastCollinearPoints collinear = new FastCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+            segment.draw();
+        }
+        StdDraw.show();
     }
 }
