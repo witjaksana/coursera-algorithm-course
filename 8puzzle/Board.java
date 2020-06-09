@@ -36,8 +36,8 @@ import java.util.List;
 
 public class Board {
 
-    private int dim;
-    private char[] tab;
+    private final int dim;
+    private final char[] tab;
     private int zero;
     private int hamming;
     private int manhattan;
@@ -55,10 +55,25 @@ public class Board {
             }
         }
 
-        for (int i = 0; i < tab.length; i++) {
-            hamming += callHamming(tab[i], i);
-            manhattan += callManhattan(tab[i], i);
+        hamming = hammingFunction(tab);
+        manhattan = manhattanFunction(tab);
+
+    }
+
+    private int hammingFunction(char[] tabs) {
+        int count = 0;
+        for (int i = 0; i < tabs.length; i++) {
+            count += callHamming(tab[i], i);
         }
+        return count;
+    }
+
+    private int manhattanFunction(char[] tabs) {
+        int count = 0;
+        for (int i = 0; i < tabs.length; i++) {
+            count += callManhattan(tab[i], i);
+        }
+        return count;
     }
 
     private Board(char[] cells, int dimension, int zero, int hamming, int manhattan) {
@@ -69,13 +84,13 @@ public class Board {
         this.manhattan = manhattan;
     }
 
-    private int callHamming(int num, int i) {
+    private int callHamming(char num, int i) {
         if (num == 0) return 0;
         if (num != (i + 1)) return 1;
         return 0;
     }
 
-    private int callManhattan(int num, int i) {
+    private int callManhattan(char num, int i) {
         if (num == 0) return 0;
         else return Math.abs(i / dim - (num - 1) / dim) + Math.abs(i % dim - (num - 1) % dim);
     }
@@ -145,8 +160,8 @@ public class Board {
         exch(copy, zero, i);
         int h = hamming;
         int m = manhattan;
-        h += callHamming(copy[zero], zero) - callHamming(copy[i], i);
-        h += callManhattan(copy[zero], zero) - callManhattan(copy[i], i);
+        h += callHamming(copy[i], i) - callHamming(tab[i], i);
+        m += callManhattan(copy[i], i) - callManhattan(tab[i], i);
         return new Board(copy, dim, i, h, m);
     }
 
@@ -182,11 +197,10 @@ public class Board {
                 blocks[i][j] = in.readInt();
         Board b = new Board(blocks);
         StdOut.println(b);
-        Board copyb = b.twin();
-        StdOut.println(copyb);
-
-        for (Board nb : b.neighbors()) {
-            StdOut.println(nb);
+        StdOut.println("Hamming = " + b.hamming());
+        for (Board board : b.neighbors()) {
+            StdOut.println(board);
+            StdOut.println("Hamming = " + board.hamming());
         }
     }
 }
