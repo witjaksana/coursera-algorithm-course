@@ -207,6 +207,7 @@ public class KdTree {
     // a nearest neighbor in the set to point p; null if the set is empty
     public Point2D nearest(Point2D p) {
         if (p == null) throw new IllegalArgumentException("Null Point2D value");
+        if (root == null) return null;
 
         Point2D ret = null;
         double min = Double.MAX_VALUE;
